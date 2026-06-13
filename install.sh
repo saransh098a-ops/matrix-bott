@@ -65,6 +65,13 @@ cat > ~/.termux/boot/start-matrix.sh << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
 termux-wake-lock
 tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; sleep 3; done"
+termux-notification -i 200 \
+  -t "⚡ Matrix Console Controls" \
+  -c "Tap buttons below to control your script" \
+  --ongoing \
+  --button1 "Start" --button1-action "bash ~/.shortcuts/Matrix_Start.sh" \
+  --button2 "View"  --button2-action "bash ~/.shortcuts/Matrix_View.sh" \
+  --button3 "Stop"  --button3-action "bash ~/.shortcuts/Matrix_Stop.sh"
 EOF
 chmod +x ~/.termux/boot/start-matrix.sh
 
@@ -76,10 +83,25 @@ tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; 
 
 termux-dialog -t "DONE!" -i "Setup complete! Opening login screen now... If asked for Phone Number, enter it with country code (e.g. +91xxxxxxxxxx). Then enter the OTP code Telegram sends you." > /dev/null
 
+# Create a persistent notification with Start/View/Stop buttons
+termux-notification -i 200 \
+  -t "⚡ Matrix Console Controls" \
+  -c "Tap buttons below to control your script" \
+  --ongoing \
+  --button1 "Start" --button1-action "bash ~/.shortcuts/Matrix_Start.sh" \
+  --button2 "View"  --button2-action "bash ~/.shortcuts/Matrix_View.sh" \
+  --button3 "Stop"  --button3-action "bash ~/.shortcuts/Matrix_Stop.sh"
+
 echo ""
 echo "================================================"
 echo "  ✅ INSTALL COMPLETE!"
 echo "  Dashboard: http://localhost:8080"
+echo ""
+echo "  >>> CONTROLS <<<"
+echo "  Check your NOTIFICATION BAR (swipe down from"
+echo "  top of screen) - you'll see 3 buttons there:"
+echo "  Start / View / Stop"
+echo "  (These stay there permanently)"
 echo ""
 echo "  >>> FIRST TIME LOGIN <<<"
 echo "  Opening Telegram login screen in 3 seconds..."
@@ -88,9 +110,7 @@ echo "    country code ke saath likho (e.g. +91...)"
 echo "    aur Enter dabao"
 echo "  - Phir Telegram pe aaya OTP code type karo"
 echo "    aur Enter dabao"
-echo "  - Ye SIRF EK BAAR hoga. Iske baad Home pe"
-echo "    Termux:Widget se Matrix_Start/View/Stop"
-echo "    use karo - login dobara nahi maangega."
+echo "  - Ye SIRF EK BAAR hoga."
 echo "================================================"
 sleep 3
 tmux attach -t matrix

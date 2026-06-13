@@ -74,16 +74,23 @@ termux-wake-lock
 tmux kill-session -t matrix 2>/dev/null
 tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; sleep 3; done"
 
-termux-dialog -t "DONE!" -i "Setup complete! Now add 'Termux:Widget' to your home screen to get Start/View/Stop buttons. Dashboard: http://localhost:8080" > /dev/null
+termux-dialog -t "DONE!" -i "Setup complete! Opening login screen now... If asked for Phone Number, enter it with country code (e.g. +91xxxxxxxxxx). Then enter the OTP code Telegram sends you." > /dev/null
 
 echo ""
 echo "================================================"
 echo "  ✅ INSTALL COMPLETE!"
 echo "  Dashboard: http://localhost:8080"
 echo ""
-echo "  NEXT STEP:"
-echo "  1. Long-press your phone home screen"
-echo "  2. Tap 'Widgets'"
-echo "  3. Find 'Termux:Widget' and drag it to home screen"
-echo "  4. You'll see 3 buttons: Start / View / Stop"
+echo "  >>> FIRST TIME LOGIN <<<"
+echo "  Opening Telegram login screen in 3 seconds..."
+echo "  - 'Enter phone number' aaye to apna number"
+echo "    country code ke saath likho (e.g. +91...)"
+echo "    aur Enter dabao"
+echo "  - Phir Telegram pe aaya OTP code type karo"
+echo "    aur Enter dabao"
+echo "  - Ye SIRF EK BAAR hoga. Iske baad Home pe"
+echo "    Termux:Widget se Matrix_Start/View/Stop"
+echo "    use karo - login dobara nahi maangega."
 echo "================================================"
+sleep 3
+tmux attach -t matrix

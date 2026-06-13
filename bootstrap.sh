@@ -16,7 +16,7 @@ pip install pyrogram tgcrypto --break-system-packages
 
 echo "📥 Step 3: Downloading your script..."
 mkdir -p ~/matrix
-curl -sL -o ~/matrix/script.py "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/script_template.py"
+curl -sL -o ~/matrix/script.py "https://raw.githubusercontent.com/saransh098a-ops/matrix-bott/main/script_template.py"
 
 echo "🔑 Step 4: Inserting your API ID and HASH..."
 sed -i "s/^API_ID.*/API_ID   = $API_ID/" ~/matrix/script.py

@@ -1,0 +1,89 @@
+#!/data/data/com.termux/files/usr/bin/bash
+clear
+echo "================================================"
+echo "   MATRIX CONSOLE - ONE-TIME AUTO INSTALLER"
+echo "================================================"
+echo ""
+
+# 1. Install required packages
+echo "[1/6] Installing packages... (this takes a minute)"
+pkg update -y -q
+pkg install -y -q python tmux git termux-api
+
+echo "[2/6] Installing python libraries..."
+pip install -q pyrogram tgcrypto --break-system-packages
+
+# 2. Ask for credentials using popup boxes
+echo "[3/6] Asking for your Telegram API credentials..."
+API_ID=$(termux-dialog -t "API ID" -i "Enter your Telegram API ID (number)" | grep -o '"text":"[^"]*"' | cut -d'"' -f4)
+API_HASH=$(termux-dialog -t "API HASH" -i "Enter your Telegram API HASH" | grep -o '"text":"[^"]*"' | cut -d'"' -f4)
+
+if [ -z "$API_ID" ] || [ -z "$API_HASH" ]; then
+    termux-dialog -t "Error" -i "API ID/HASH empty. Run install again." > /dev/null
+    exit 1
+fi
+
+# 3. Download main script and insert credentials
+echo "[4/6] Downloading script and inserting your credentials..."
+mkdir -p ~/matrix
+curl -sL -o ~/matrix/script.py "https://raw.githubusercontent.com/saransh098a-ops/matrix-bott/main/script_template.py"
+sed -i "s/^API_ID.*/API_ID   = $API_ID/" ~/matrix/script.py
+sed -i "s/^API_HASH.*/API_HASH = \"$API_HASH\"/" ~/matrix/script.py
+
+# 4. Create home-screen shortcut scripts
+echo "[5/6] Creating home-screen shortcuts..."
+mkdir -p ~/.shortcuts
+
+cat > ~/.shortcuts/Matrix_Start.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+termux-wake-lock
+tmux kill-session -t matrix 2>/dev/null
+tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; sleep 3; done"
+sleep 1
+tmux attach -t matrix
+EOF
+chmod +x ~/.shortcuts/Matrix_Start.sh
+
+cat > ~/.shortcuts/Matrix_View.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+tmux attach -t matrix || echo "Not running. Tap Matrix_Start first."
+EOF
+chmod +x ~/.shortcuts/Matrix_View.sh
+
+cat > ~/.shortcuts/Matrix_Stop.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+tmux kill-session -t matrix 2>/dev/null
+termux-wake-unlock
+echo "Matrix stopped."
+sleep 1
+EOF
+chmod +x ~/.shortcuts/Matrix_Stop.sh
+
+# 5. Setup auto-start on boot
+mkdir -p ~/.termux/boot
+cat > ~/.termux/boot/start-matrix.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+termux-wake-lock
+tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; sleep 3; done"
+EOF
+chmod +x ~/.termux/boot/start-matrix.sh
+
+# 6. Start it now for the first time
+echo "[6/6] Starting Matrix Console now..."
+termux-wake-lock
+tmux kill-session -t matrix 2>/dev/null
+tmux new-session -d -s matrix "cd ~/matrix && while true; do python3 script.py; sleep 3; done"
+
+termux-dialog -t "DONE!" -i "Setup complete! Now add 'Termux:Widget' to your home screen to get Start/View/Stop buttons. Dashboard: http://localhost:8080" > /dev/null
+
+echo ""
+echo "================================================"
+echo "  ✅ INSTALL COMPLETE!"
+echo "  Dashboard: http://localhost:8080"
+echo ""
+echo "  NEXT STEP:"
+echo "  1. Long-press your phone home screen"
+echo "  2. Tap 'Widgets'"
+echo "  3. Find 'Termux:Widget' and drag it to home screen"
+echo "  4. You'll see 3 buttons: Start / View / Stop"
+echo "================================================"

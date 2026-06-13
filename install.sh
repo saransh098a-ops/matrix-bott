@@ -15,8 +15,8 @@ pip install -q pyrogram tgcrypto --break-system-packages
 
 # 2. Ask for credentials using popup boxes
 echo "[3/6] Asking for your Telegram API credentials..."
-API_ID=$(termux-dialog -t "API ID" -i "Enter your Telegram API ID (number)" | grep -o '"text":"[^"]*"' | cut -d'"' -f4)
-API_HASH=$(termux-dialog -t "API HASH" -i "Enter your Telegram API HASH" | grep -o '"text":"[^"]*"' | cut -d'"' -f4)
+API_ID=$(termux-dialog -t "API ID" -i "Enter your Telegram API ID (number)" | grep -o '"text": *"[^"]*"' | cut -d'"' -f4)
+API_HASH=$(termux-dialog -t "API HASH" -i "Enter your Telegram API HASH" | grep -o '"text": *"[^"]*"' | cut -d'"' -f4)
 
 if [ -z "$API_ID" ] || [ -z "$API_HASH" ]; then
     termux-dialog -t "Error" -i "API ID/HASH empty. Run install again." > /dev/null
